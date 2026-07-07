@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PixelArena — یک میلیون پیکسل</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#D4AF37;--gold2:#F5D678;
+  --dark:#07090F;--dark2:#0D1219;--dark3:#131A24;
+  --card:#111827;--border:rgba(212,175,55,.18);
+  --text:#E6E6F0;--muted:#6B7280;
+  --accent:#6C63FF;--green:#00E5A0;--red:#FF4D6D;--orange:#FF6B00;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;direction:rtl}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+
+/* ── NAV ── */
+nav{position:fixed;inset:0 0 auto;height:58px;z-index:1000;background:rgba(7,9,15,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.3rem;gap:.8rem}
+.logo{display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0}
+.logo-i{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.logo-t{font-size:1.15rem;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-c{display:flex;gap:.95rem;align-items:center;flex:1}
+.nav-c a{color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;transition:color .2s;user-select:none}
+.nav-c a:hover,.nav-c a.on{color:var(--gold)}
+.nav-r{display:flex;gap:.45rem;align-items:center;flex-shrink:0}
+.nav-bal{display:none;align-items:center;gap:5px;background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.24);border-radius:7px;padding:.3rem .78rem;font-size:.76rem;font-weight:700;color:var(--green);cursor:pointer;transition:all .2s}
+.nav-bal:hover{background:rgba(0,229,160,.15)}
+.nav-bal-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,160,.5)}50%{box-shadow:0 0 0 5px transparent}}
+
+/* ── BUTTONS ── */
+.btn{padding:.44rem 1rem;border-radius:7px;border:none;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:4px;justify-content:center}
+.btn-ol{background:transparent;border:1.5px solid var(--gold);color:var(--gold)}
+.btn-ol:hover{background:rgba(212,175,55,.1)}
+.btn-gd{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-weight:700}
+.btn-gd:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 5px 16px rgba(212,175,55,.28)}
+.btn-ac{background:linear-gradient(135deg,var(--accent),#8B80FF);color:#fff}
+.btn-ac:hover{opacity:.88;transform:translateY(-1px)}
+.btn-gr{background:linear-gradient(135deg,var(--green),#00BF80);color:#000;font-weight:700}
+.btn-gr:hover{opacity:.88;transform:translateY(-1px)}
+.btn-rd{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.28);color:var(--red)}
+.btn-sm{padding:.34rem .75rem;font-size:.72rem}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding-top:58px}
+.page.active{display:block}
+#pg-map{display:none;flex-direction:column;height:100vh;padding-top:58px;box-sizing:border-box;overflow:hidden}
+#pg-map.active{display:flex!important}
+
+/* ── HOME ── */
+.hero{text-align:center;padding:4rem 1.5rem 2rem}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(212,175,55,.09);border:1px solid var(--border);border-radius:50px;padding:.32rem .85rem;font-size:.7rem;color:var(--gold);margin-bottom:1.2rem;font-weight:600}
+.hero h1{font-size:clamp(1.8rem,5vw,3.4rem);font-weight:800;line-height:1.2;margin-bottom:.85rem}
+.hero h1 span{background:linear-gradient(135deg,var(--gold),var(--gold2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:.92rem;color:var(--muted);max-width:520px;margin:0 auto 1.8rem;line-height:1.9}
+.hero-btns{display:flex;flex-direction:column;gap:.58rem;align-items:center}
+.hero-btns .btn{width:264px;padding:.7rem;font-size:.9rem;border-radius:9px}
+.h-prof-btn{position:relative;width:264px;display:flex;align-items:center;gap:.85rem;background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(108,99,255,.06));border:1.5px solid rgba(212,175,55,.3);border-radius:11px;padding:.7rem 1rem;cursor:pointer;transition:all .25s;font-family:inherit;color:var(--text);text-align:right}
+.h-prof-btn:hover{border-color:var(--gold);background:rgba(212,175,55,.14);transform:translateY(-2px);box-shadow:0 8px 22px rgba(212,175,55,.12)}
+.h-prof-btn .av{font-size:1.35rem;flex-shrink:0}
+.h-prof-btn .lbl{font-size:.85rem;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.h-prof-btn .sub{font-size:.7rem;color:var(--muted);margin-top:.1rem}
+.h-prof-btn .arr{font-size:.9rem;color:var(--gold);margin-right:auto;transition:transform .2s}
+.h-prof-btn:hover .arr{transform:translateX(-3px)}
+.h-prof-dot{position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--dark);display:none;animation:pulse 2s infinite}
+
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:1.6rem auto;max-width:820px}
+.sb-i{background:var(--card);padding:1.1rem .8rem;text-align:center}
+.sb-n{font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-l{font-size:.68rem;color:var(--muted);margin-top:.16rem}
+
+.sec{padding:1.5rem 1.3rem;max-width:1200px;margin:0 auto}
+.sec-title{display:flex;align-items:center;gap:9px;font-size:1.05rem;font-weight:700;margin-bottom:1rem}
+.sec-tag{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.cat-tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1rem}
+.ctab{padding:.32rem .78rem;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .18s}
+.ctab.on,.ctab:hover{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,.07)}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:.72rem}
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:.9rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.tcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--accent));opacity:0;transition:opacity .2s}
+.tcard:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 20px rgba(212,175,55,.09)}
+.tcard:hover::before{opacity:1}
+.te{font-size:1.85rem;margin-bottom:.42rem;display:block}
+.tn{font-size:.8rem;font-weight:700;margin-bottom:.14rem}
+.tm{font-size:.67rem;color:var(--muted)}
+.tp{margin-top:.42rem;display:inline-flex;align-items:center;gap:3px;background:rgba(212,175,55,.09);border:1px solid rgba(212,175,55,.18);border-radius:20px;padding:.16rem .6rem;font-size:.64rem;color:var(--gold);font-weight:700}
+.tf{margin-top:.28rem;font-size:.63rem;color:var(--green);font-weight:600}
+
+/* ── MAP ── */
+.map-top{display:flex;align-items:center;justify-content:space-between;padding:.42rem .9rem;background:rgba(7,9,15,.98);border-bottom:1px solid var(--border);flex-shrink:0;z-index:50;flex-wrap:wrap;gap:.35rem}
+.map-title{font-size:.88rem;font-weight:700}.map-title span{color:var(--gold)}
+.canvas-area{flex:1;position:relative;overflow:hidden;background:#030508;min-height:0}
+#cvs{display:block;image-rendering:pixelated;cursor:grab;position:absolute;top:0;left:0}
+.tools{position:absolute;top:9px;left:9px;display:flex;flex-direction:column;gap:2px;z-index:100;background:rgba(7,9,15,.93);border:1px solid var(--border);border-radius:9px;padding:4px 3px;pointer-events:all}
+.tsep{height:1px;background:var(--border);margin:2px 2px}
+.tbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:42px;height:38px;background:transparent;border:1.5px solid transparent;border-radius:7px;color:var(--muted);cursor:pointer;font-size:.85rem;transition:all .14s;font-family:inherit;padding:0}
+.tbtn-l{font-size:.42rem;font-weight:600;color:inherit;line-height:1}
+.tbtn:hover{background:rgba(212,175,55,.09);border-color:rgba(212,175,55,.3);color:var(--gold)}
+.tbtn:active{transform:scale(.92)}
+.tbtn.on{background:rgba(212,175,55,.14);border-color:var(--gold);color:var(--gold)}
+.mm{position:absolute;top:9px;right:9px;background:rgba(7,9,15,.92);border:1px solid var(--border);border-radius:7px;padding:4px;width:100px;z-index:100}
+.mm-l{font-size:.5rem;color:var(--muted);text-align:center;margin-bottom:2px}
+#mini{width:100%;border-radius:3px;display:block}
+.coord{position:absolute;bottom:9px;left:9px;background:rgba(7,9,15,.88);border:1px solid var(--border);border-radius:6px;padding:.26rem .6rem;font-size:.63rem;color:var(--muted);z-index:100}
+.coord span{color:var(--gold);font-weight:700}
+.leg{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);display:flex;gap:.45rem;background:rgba(7,9,15,.88);border:1px solid var(--border);border-radius:7px;padding:.28rem .75rem;z-index:100}
+.leg-i{display:flex;align-items:center;gap:3px;color:var(--muted);font-size:.62rem}
+.leg-b{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* ── BUY PANEL ── */
+.bpanel{position:absolute;bottom:0;right:0;width:278px;background:rgba(9,13,21,.97);backdrop-filter:blur(12px);border-left:1px solid var(--border);border-top:1px solid var(--border);border-radius:12px 0 0 0;z-index:100;pointer-events:all;transition:transform .28s;max-height:calc(100% - 6px);overflow-y:auto}
+.bpanel.hidden{transform:translateY(110%)}
+.bp-h{display:flex;align-items:center;justify-content:space-between;padding:.56rem .8rem .44rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(9,13,21,.98);z-index:1}
+.bp-title{font-size:.8rem;font-weight:700}
+.bp-tog{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.68rem;border-radius:5px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.bp-body{padding:.64rem .8rem}
+.bp-wal{display:flex;justify-content:space-between;align-items:center;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);border-radius:8px;padding:.44rem .66rem;margin-bottom:.48rem;cursor:pointer;transition:all .18s}
+.bp-wal:hover{border-color:var(--green)}
+.bp-wal .wl{font-size:.59rem;color:var(--muted)}
+.bp-wal .wv{font-size:.9rem;font-weight:800;color:var(--green)}
+.bp-grid{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-bottom:.48rem}
+.bp-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:.36rem .46rem}
+.bp-lbl{font-size:.56rem;color:var(--muted);margin-bottom:.07rem}
+.bp-val{font-size:.72rem;font-weight:700}
+.bp-tot{display:flex;align-items:center;justify-content:space-between;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.18);border-radius:7px;padding:.44rem .66rem;margin-bottom:.48rem}
+.bp-price{font-size:1.1rem;font-weight:800;color:var(--gold);line-height:1}
+.bp-price small{font-size:.6rem;color:var(--muted);font-weight:400}
+.bp-clr{background:rgba(255,77,109,.09);border:1px solid rgba(255,77,109,.24);color:var(--red);border-radius:6px;padding:.24rem .5rem;font-size:.63rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.bp-link{width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.4rem .6rem;color:var(--text);font-family:inherit;font-size:.7rem;outline:none;direction:ltr;margin-bottom:.48rem;display:block}
+.bp-link:focus{border-color:var(--gold)}
+.bp-link::placeholder{color:var(--muted)}
+.bp-btns{display:flex;gap:.36rem;margin-bottom:.4rem}
+.bp-sel{flex:1;padding:.54rem .3rem;border-radius:7px;border:1.5px solid var(--gold);background:rgba(212,175,55,.07);color:var(--gold);font-family:inherit;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .18s}
+.bp-sel.on,.bp-sel:hover{background:rgba(212,175,55,.17)}
+.bp-buy{flex:1.3;padding:.54rem .3rem;border-radius:7px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-family:inherit;font-size:.7rem;font-weight:800;cursor:pointer;transition:all .18s}
+.bp-buy:hover{opacity:.88;transform:translateY(-1px)}
+.bp-hint{font-size:.57rem;color:var(--muted);text-align:center;line-height:1.55}
+
+/* ── PROFILE ── */
+.prof-hero{background:linear-gradient(135deg,var(--dark3),var(--dark2));border-bottom:1px solid var(--border);padding:1.5rem 1.3rem}
+.ph-in{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.p-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.9rem;flex-shrink:0;box-shadow:0 0 0 3px rgba(212,175,55,.2)}
+.p-inf h2{font-size:1.15rem;font-weight:700;margin-bottom:.14rem}
+.p-wall{font-size:.68rem;color:var(--muted);margin-bottom:.38rem}
+.p-badges{display:flex;gap:.35rem;flex-wrap:wrap}
+.badge{padding:.18rem .62rem;border-radius:50px;font-size:.62rem;font-weight:600}
+.bg{background:rgba(212,175,55,.11);color:var(--gold);border:1px solid rgba(212,175,55,.24)}
+.bg2{background:rgba(0,229,160,.09);color:var(--green);border:1px solid rgba(0,229,160,.2)}
+.bg3{background:rgba(108,99,255,.11);color:var(--accent);border:1px solid rgba(108,99,255,.24)}
+.p-acts{margin-right:auto;display:flex;gap:.4rem;flex-wrap:wrap}
+
+/* PROFILE TABS */
+.p-tabs{background:var(--dark2);border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:50}
+.p-tabs-in{max-width:880px;margin:0 auto;display:flex}
+.ptab{flex:1;padding:.6rem .3rem;text-align:center;font-size:.76rem;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;font-family:inherit;border-bottom:2.5px solid transparent;transition:all .18s}
+.ptab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.ptab:hover{color:var(--text)}
+.ptab-c{animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* WALLET CARD IN PROFILE */
+.pwc-wrap{max-width:880px;margin:.85rem auto 0;padding:0 1.3rem}
+.pwc{background:linear-gradient(135deg,var(--dark3),var(--dark2));border:1px solid rgba(0,229,160,.28);border-radius:14px;padding:1.1rem 1.3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;position:relative;overflow:hidden}
+.pwc::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 10% 50%,rgba(0,229,160,.07),transparent 50%);pointer-events:none}
+.pwc-info{position:relative;z-index:1}
+.pwc-lbl{font-size:.65rem;color:var(--muted);margin-bottom:.18rem}
+.pwc-bal{font-size:2.1rem;font-weight:800;background:linear-gradient(135deg,var(--green),#00BF80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.pwc-sub{font-size:.68rem;color:var(--muted);margin-top:.14rem}
+.pwc-acts{display:flex;gap:.42rem;flex-wrap:wrap;position:relative;z-index:1}
+
+/* STAT CARDS */
+.pstats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.62rem;padding:1rem 1.3rem;max-width:880px;margin:0 auto}
+.psc{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:.88rem;position:relative;overflow:hidden}
+.psc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--accent))}
+.psc-l{font-size:.64rem;color:var(--muted);margin-bottom:.3rem}
+.psc-v{font-size:1.25rem;font-weight:800;color:var(--gold)}
+.psc-s{font-size:.62rem;color:var(--muted);margin-top:.1rem}
+
+/* UPLOAD ZONE */
+.upload-zone{background:linear-gradient(135deg,rgba(212,175,55,.05),rgba(108,99,255,.04));border:2px dashed rgba(212,175,55,.28);border-radius:14px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .22s;margin-bottom:1.1rem}
+.upload-zone:hover{border-color:var(--gold);background:rgba(212,175,55,.08)}
+
+/* LAND GRID */
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.72rem;margin-top:.72rem}
+.lcard{background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;transition:all .2s}
+.lcard:hover{border-color:var(--gold);transform:translateY(-2px)}
+.lc-cv{width:100%;height:145px;display:block;image-rendering:pixelated;cursor:pointer}
+.lc-body{padding:.55rem .72rem}
+.lc-name{font-size:.78rem;font-weight:700;margin-bottom:.12rem}
+.lc-px{font-size:.64rem;color:var(--gold);margin-bottom:.38rem}
+.lc-acts{display:flex;gap:.32rem;flex-wrap:wrap}
+
+/* TX LIST */
+.tx-list{display:flex;flex-direction:column;gap:.42rem}
+.tx-item{display:flex;align-items:center;gap:.68rem;padding:.6rem .75rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px}
+.tx-ic{width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.tx-ic.in{background:rgba(0,229,160,.12);border:1px solid rgba(0,229,160,.22)}
+.tx-ic.out{background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.22)}
+.tx-ic.buy{background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.22)}
+.tx-inf{flex:1;min-width:0}
+.tx-desc{font-size:.74rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-date{font-size:.62rem;color:var(--muted);margin-top:.04rem}
+.tx-amt{font-size:.82rem;font-weight:800;flex-shrink:0}
+.tx-amt.in{color:var(--green)}.tx-amt.out{color:var(--red)}.tx-amt.buy{color:var(--gold)}
+
+/* ACCOUNT TAB */
+.acc-row{display:flex;justify-content:space-between;align-items:center;padding:.55rem .7rem;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--border);margin-bottom:.48rem}
+.acc-row .k{font-size:.7rem;color:var(--muted)}
+.acc-row .v{font-size:.8rem;font-weight:600;max-width:200px;text-align:left;direction:ltr;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── MODALS ── */
+.mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);z-index:9000;align-items:center;justify-content:center}
+.mov.show{display:flex}
+.modal{background:var(--dark3);border:1px solid var(--border);border-radius:15px;padding:1.82rem;width:90%;max-width:408px;position:relative;animation:msu .24s ease;max-height:92vh;overflow-y:auto}
+@keyframes msu{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mc{position:absolute;top:.78rem;left:.78rem;background:none;border:none;color:var(--muted);font-size:1.05rem;cursor:pointer}
+.mc:hover{color:var(--text)}
+.modal h2{font-size:1.1rem;font-weight:700;margin-bottom:.22rem;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.modal .sub{color:var(--muted);font-size:.76rem;margin-bottom:1.1rem;line-height:1.65}
+.fg{margin-bottom:.76rem}
+.fl{font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:.32rem;display:block}
+.fi{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:.56rem .8rem;color:var(--text);font-family:inherit;font-size:.83rem;outline:none;transition:border .18s}
+.fi:focus{border-color:var(--gold)}
+.fi::placeholder{color:var(--muted)}
+.auth-sw{text-align:center;margin-top:.76rem;font-size:.74rem;color:var(--muted)}
+.auth-sw a{color:var(--gold);cursor:pointer}
+@keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+
+/* BUY MODAL */
+.bc-row{display:flex;justify-content:space-between;font-size:.8rem;padding:.22rem 0}
+.bc-row .k{color:var(--muted)}.bc-row .v{font-weight:700}
+.bc-tot{border-top:1px solid var(--border);margin-top:.26rem;padding-top:.48rem;display:flex;justify-content:space-between;font-size:.95rem;font-weight:700;color:var(--gold)}
+.buy-auth{display:none;border:1px solid rgba(212,175,55,.24);border-radius:10px;padding:.85rem;margin-bottom:.82rem;background:rgba(212,175,55,.04)}
+.buy-user{display:none;border:1px solid rgba(0,229,160,.22);border-radius:10px;padding:.6rem .82rem;margin-bottom:.8rem;background:rgba(0,229,160,.05)}
+
+/* WALLET MODAL */
+.wm-bal{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.22);border-radius:11px;padding:.85rem;text-align:center;margin-bottom:1rem}
+.wm-n{font-size:2rem;font-weight:800;color:var(--green);line-height:1;margin:.15rem 0}
+.amt-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.42rem;margin:.72rem 0}
+.amt-btn{padding:.48rem .3rem;border-radius:8px;border:1.5px solid rgba(0,229,160,.24);background:rgba(0,229,160,.06);color:var(--green);font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .18s;text-align:center}
+.amt-btn:hover{background:rgba(0,229,160,.16);border-color:var(--green)}
+
+/* CONNECT WALLET */
+.wopt{width:100%;display:flex;align-items:center;gap:11px;border-radius:11px;padding:.82rem 1rem;cursor:pointer;margin-bottom:.52rem;transition:all .18s;font-family:inherit;border:1.5px solid transparent}
+.wopt:hover{transform:translateY(-2px)}
+.wopt-i{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
+.wopt-inf{text-align:right}.wopt-n{font-weight:700;font-size:.88rem;color:#fff}.wopt-s{font-size:.7rem;color:var(--muted);margin-top:.06rem}
+.wopt-b{margin-right:auto;border-radius:20px;padding:.13rem .5rem;font-size:.64rem;font-weight:700}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%) translateY(110px);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.72rem 1.2rem;display:flex;align-items:center;gap:7px;font-size:.78rem;z-index:99999;opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:340px;box-shadow:0 15px 45px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.t-ti{font-weight:700;margin-bottom:.1rem}.t-m{color:var(--muted);font-size:.7rem}
+
+@media(max-width:700px){
+  nav{padding:0 .8rem}.nav-c{display:none}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .bpanel{width:100%;border-radius:11px 11px 0 0;border-left:none}
+  .mm{display:none}.leg{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="logo" id="logo"><div class="logo-i">⚡</div><span class="logo-t">PixelArena</span></div>
+  <div class="nav-c">
+    <a id="nl-home" class="on">🏠 خانه</a>
+    <a id="nl-map">🗺️ زمین‌ها</a>
+    <a id="nl-profile">👤 پروفایل</a>
+  </div>
+  <div class="nav-r">
+    <div class="nav-bal" id="navBal">
+      <div class="nav-bal-dot"></div>
+      <span id="navBalAmt">0 USDT</span>
+    </div>
+    <button class="btn btn-ol btn-sm" id="loginBtn">ورود</button>
+    <button class="btn btn-gd btn-sm" id="regBtn">ثبت‌نام</button>
+  </div>
+</nav>
+
+<!-- ═══ HOME ═══ -->
+<div id="pg-home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">🌟 پلتفرم شماره ۱ پیکسل ورزشی جهان</div>
+    <h1>یک میلیون پیکسل<br><span>برای تیم مورد علاقه‌ات</span></h1>
+    <p>هر پیکسل = <strong style="color:var(--gold)">۱ USDT</strong> · قیمت ثابت · مالکیت دائمی · لینک اختصاصی</p>
+    <div class="hero-btns">
+      <button class="btn btn-gd" id="hMapBtn">🗺️ مشاهده زمین‌ها</button>
+      <button class="btn btn-ac" id="hWalBtn">👛 اتصال کیف پول</button>
+      <button class="btn btn-ol" id="hRegBtn">ثبت‌نام رایگان</button>
+      <button class="h-prof-btn" id="hProfBtn">
+        <span class="av" id="hpAv">👤</span>
+        <div><div class="lbl">👤 پروفایل من</div><div class="sub" id="hpSub">زمین‌ها و تراکنش‌های شما</div></div>
+        <span class="arr">←</span>
+        <span class="h-prof-dot" id="hpDot"></span>
+      </button>
+    </div>
+  </div>
+  <div class="stats-bar" style="margin:1.5rem auto;padding:0 1.3rem">
+    <div class="sb-i"><div class="sb-n">۱,۰۰۰,۰۰۰</div><div class="sb-l">کل پیکسل</div></div>
+    <div class="sb-i"><div class="sb-n" id="sn-sold">0</div><div class="sb-l">فروخته‌شده</div></div>
+    <div class="sb-i"><div class="sb-n" id="sn-free">1,000,000</div><div class="sb-l">پیکسل آزاد</div></div>
+    <div class="sb-i"><div class="sb-n">$1</div><div class="sb-l">قیمت هر پیکسل</div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-title"><span class="sec-tag">🏆 دسته‌بندی زمین‌ها</span><div class="sec-line"></div></div>
+    <div class="cat-tabs" id="catTabs">
+      <button class="ctab on" data-cat="all">همه</button>
+      <button class="ctab" data-cat="football">⚽ فوتبال</button>
+      <button class="ctab" data-cat="basketball">🏀 بسکتبال</button>
+      <button class="ctab" data-cat="formula1">🏎️ فرمول ۱</button>
+      <button class="ctab" data-cat="celeb">⭐ سلبریتی</button>
+      <button class="ctab" data-cat="esports">🎮 اسپورت</button>
+    </div>
+    <div class="tgrid" id="tgrid"></div>
+  </div>
+</div>
+
+<!-- ═══ MAP ═══ -->
+<div id="pg-map" class="page">
+  <div class="map-top">
+    <div style="display:flex;align-items:center;gap:.6rem">
+      <button class="btn btn-ol btn-sm" id="mapBack">← بازگشت</button>
+      <div class="map-title" id="mapTitle">🗺️ <span>انتخاب زمین</span></div>
+    </div>
+    <div style="font-size:.67rem;color:var(--muted)">✋پن · ⬜انتخاب · اسکرول=زوم</div>
+  </div>
+  <div class="canvas-area" id="canvasWrap">
+    <canvas id="cvs"></canvas>
+    <div class="tools">
+      <button class="tbtn on" id="tPan"><span>✋</span><span class="tbtn-l">پن</span></button>
+      <button class="tbtn" id="tSel"><span>⬜</span><span class="tbtn-l">انتخاب</span></button>
+      <div class="tsep"></div>
+      <button class="tbtn" id="tZI"><span style="font-size:1.1rem;font-weight:900">+</span><span class="tbtn-l">زوم+</span></button>
+      <button class="tbtn" id="tZO"><span style="font-size:1.3rem;font-weight:900">−</span><span class="tbtn-l">زوم-</span></button>
+      <button class="tbtn" id="tRst"><span>⊙</span><span class="tbtn-l">ریست</span></button>
+      <div class="tsep"></div>
+      <button class="tbtn" id="tClr"><span>✕</span><span class="tbtn-l">پاک</span></button>
+    </div>
+    <div class="mm"><div class="mm-l">📍 نقشه</div><canvas id="mini" width="92" height="60"></canvas></div>
+    <div class="coord" id="coord">📐 <span>–</span></div>
+    <div class="leg">
+      <div class="leg-i"><div class="leg-b" style="background:#1a2436"></div>آزاد</div>
+      <div class="leg-i"><div class="leg-b" style="background:var(--orange)"></div>انتخابی</div>
+      <div class="leg-i"><div class="leg-b" style="background:#c0392b"></div>دیگران</div>
+      <div class="leg-i"><div class="leg-b" style="background:var(--green)"></div>شما</div>
+    </div>
+    <div class="bpanel" id="bpanel">
+      <div class="bp-h"><div class="bp-title">💳 خرید پیکسل</div><button class="bp-tog" id="bpTog">▼</button></div>
+      <div class="bp-body" id="bpBody">
+        <div class="bp-wal" id="bpWalRow">
+          <div><div class="wl">💰 کیف پول</div><div class="wv" id="bpWalAmt">اتصال نشده</div></div>
+          <span style="font-size:.62rem;color:var(--muted)">←</span>
+        </div>
+        <div class="bp-grid">
+          <div class="bp-item"><div class="bp-lbl">زمین</div><div class="bp-val" id="bpTeam">–</div></div>
+          <div class="bp-item"><div class="bp-lbl">پیکسل</div><div class="bp-val" id="bpCnt">0</div></div>
+          <div class="bp-item"><div class="bp-lbl">موقعیت</div><div class="bp-val" id="bpPos" style="direction:ltr;font-size:.66rem">–</div></div>
+          <div class="bp-item"><div class="bp-lbl">قیمت/px</div><div class="bp-val" style="color:var(--green)">$1</div></div>
+        </div>
+        <div class="bp-tot">
+          <div><div style="font-size:.58rem;color:var(--muted)">مجموع</div><div class="bp-price" id="bpTot">$0 <small>USDT</small></div></div>
+          <button class="bp-clr" id="bpClr">✕ پاک</button>
+        </div>
+        <input type="url" class="bp-link" id="bpLink" placeholder="🔗 لینک اختصاصی (اختیاری)">
+        <div class="bp-btns">
+          <button class="bp-sel" id="bpSel">⬜ انتخاب</button>
+          <button class="bp-buy" id="bpBuy">💳 خرید</button>
+        </div>
+        <div class="bp-hint">هر پیکسل = $1 USDT · MetaMask یا Trust Wallet</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROFILE ═══ -->
+<div id="pg-profile" class="page">
+  <div class="prof-hero">
+    <div class="ph-in">
+      <div class="p-av" id="pAv">👤</div>
+      <div class="p-inf">
+        <h2 id="pName">نام کاربری</h2>
+        <div class="p-wall" id="pSub">–</div>
+        <div class="p-badges">
+          <span class="badge bg"  id="pBLand"  style="display:none">🌟 صاحب زمین</span>
+          <span class="badge bg2" id="pBWal"   style="display:none">👛 کیف پول متصل</span>
+        </div>
+      </div>
+      <div class="p-acts">
+        <button class="btn btn-ac btn-sm" id="pConnBtn">👛 کیف پول</button>
+        <button class="btn btn-gd btn-sm" id="pBuyBtn">🗺️ خرید زمین</button>
+        <button class="btn btn-rd btn-sm" id="logoutBtn">🚪 خروج</button>
+      </div>
+    </div>
+  </div>
+  <div class="p-tabs"><div class="p-tabs-in">
+    <button class="ptab on" data-tab="over" onclick="pTab(this)">📊 خلاصه</button>
+    <button class="ptab" data-tab="lands"  onclick="pTab(this)">🗺️ زمین‌ها</button>
+    <button class="ptab" data-tab="txs"    onclick="pTab(this)">📋 تراکنش‌ها</button>
+    <button class="ptab" data-tab="acc"    onclick="pTab(this)">⚙️ حساب</button>
+  </div></div>
+
+  <!-- تب خلاصه -->
+  <div id="ptab-over" class="ptab-c">
+    <div class="pwc-wrap">
+      <div class="pwc">
+        <div class="pwc-info">
+          <div class="pwc-lbl">💰 موجودی کیف پول</div>
+          <div class="pwc-bal" id="profBal">–</div>
+          <div class="pwc-sub">USDT · برای خرید زمین</div>
+        </div>
+        <div class="pwc-acts">
+          <button class="btn btn-gr btn-sm" id="pDeposit">⬇️ شارژ</button>
+          <button class="btn btn-ol btn-sm" id="pWithdraw">⬆️ برداشت</button>
+        </div>
+      </div>
+    </div>
+    <div class="pstats">
+      <div class="psc"><div class="psc-l">📐 کل پیکسل</div><div class="psc-v" id="pp-px">0</div><div class="psc-s">خریداری‌شده</div></div>
+      <div class="psc"><div class="psc-l">💰 هزینه شده</div><div class="psc-v" id="pp-val">$0</div><div class="psc-s">USDT</div></div>
+      <div class="psc"><div class="psc-l">🗺️ تعداد زمین</div><div class="psc-v" id="pp-cnt">0</div><div class="psc-s">قطعه</div></div>
+      <div class="psc"><div class="psc-l">👛 موجودی</div><div class="psc-v" id="pp-rem">–</div><div class="psc-s">USDT</div></div>
+    </div>
+    <div style="max-width:880px;margin:.5rem auto 0;padding:0 1.3rem 1.5rem">
+      <div class="sec-title" style="margin-bottom:.7rem;font-size:.88rem">
+        <span class="sec-tag">📋 آخرین تراکنش‌ها</span><div class="sec-line"></div>
+        <a onclick="pTab(document.querySelector('[data-tab=txs]'))" style="font-size:.7rem;color:var(--gold);cursor:pointer">همه ←</a>
+      </div>
+      <div class="tx-list" id="txMini"></div>
+    </div>
+  </div>
+
+  <!-- تب زمین‌ها -->
+  <div id="ptab-lands" class="ptab-c" style="display:none">
+    <div style="max-width:880px;margin:1rem auto;padding:0 1.3rem">
+      <div class="upload-zone" id="upZone"
+        onclick="G('gImgIn').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
+        ondragleave="this.style.borderColor='rgba(212,175,55,.28)'"
+        ondrop="event.preventDefault();this.style.borderColor='rgba(212,175,55,.28)';handleDrop(event)">
+        <div style="font-size:2rem;margin-bottom:.45rem" id="upIcon">🖼️</div>
+        <div style="font-size:.88rem;font-weight:700;margin-bottom:.28rem" id="upTitle">آپلود عکس از گالری روی زمین‌ها</div>
+        <div style="font-size:.73rem;color:var(--muted);line-height:1.7;margin-bottom:.82rem" id="upSub">عکس انتخاب کنید تا روی پیکسل‌های خریداری‌شده — به جای رنگ سبز — نمایش داده شود</div>
+        <input type="file" id="gImgIn" accept="image/*" style="display:none" onchange="handleImgSel(event)">
+        <div style="display:flex;gap:.45rem;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-gd btn-sm" onclick="event.stopPropagation();G('gImgIn').click()">📁 انتخاب از گالری</button>
+          <button class="btn btn-rd btn-sm" id="clearImgBtn" onclick="event.stopPropagation();clearGImg()" style="display:none">🗑️ حذف عکس</button>
+        </div>
+        <div id="upStatus" style="margin-top:.5rem;font-size:.7rem;color:var(--green);font-weight:600;display:none"></div>
+      </div>
+      <div class="sec-title" style="margin-bottom:.82rem;font-size:.88rem"><span class="sec-tag">🗺️ زمین‌های من</span><div class="sec-line"></div></div>
+      <div class="lgrid" id="lgrid">
+        <div style="color:var(--muted);font-size:.78rem;padding:1.5rem;grid-column:1/-1;text-align:center">
+          هنوز زمینی ندارید · <a style="color:var(--gold);cursor:pointer" onclick="go('home')">اولین زمین را بخرید ←</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- تب تراکنش‌ها -->
+  <div id="ptab-txs" class="ptab-c" style="display:none">
+    <div style="max-width:880px;margin:1rem auto;padding:0 1.3rem 2rem">
+      <div class="sec-title" style="margin-bottom:.82rem;font-size:.88rem"><span class="sec-tag">📋 تاریخچه تراکنش‌ها</span><div class="sec-line"></div></div>
+      <div class="tx-list" id="txAll"><div style="text-align:center;color:var(--muted);font-size:.78rem;padding:2rem">هنوز تراکنشی ندارید</div></div>
+    </div>
+  </div>
+
+  <!-- تب حساب -->
+  <div id="ptab-acc" class="ptab-c" style="display:none">
+    <div style="max-width:500px;margin:1.1rem auto;padding:0 1.3rem 2rem">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:1.2rem;margin-bottom:1rem">
+        <div class="sec-title" style="margin-bottom:.9rem;font-size:.88rem"><span class="sec-tag">👤 اطلاعات حساب</span><div class="sec-line"></div></div>
+        <div class="acc-row"><span class="k">👤 نام نمایشی</span><span class="v" id="acc-name">–</span></div>
+        <div class="acc-row"><span class="k">📧 ایمیل</span><span class="v" id="acc-email">–</span></div>
+        <div class="acc-row"><span class="k">📅 تاریخ ثبت‌نام</span><span class="v" id="acc-reg">–</span></div>
+        <div class="acc-row"><span class="k">👛 آدرس کیف پول</span><span class="v" id="acc-addr" style="color:var(--green)">–</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
+        <div style="background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.18);border-radius:9px;padding:.75rem;text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--gold)" id="acc-px">0</div><div style="font-size:.64rem;color:var(--muted)">کل پیکسل</div></div>
+        <div style="background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);border-radius:9px;padding:.75rem;text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--green)" id="acc-bal">–</div><div style="font-size:.64rem;color:var(--muted)">USDT موجودی</div></div>
+        <div style="background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.18);border-radius:9px;padding:.75rem;text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--accent)" id="acc-lands">0</div><div style="font-size:.64rem;color:var(--muted)">تعداد زمین</div></div>
+        <div style="background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.18);border-radius:9px;padding:.75rem;text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--red)" id="acc-spent">$0</div><div style="font-size:.64rem;color:var(--muted)">هزینه شده</div></div>
+      </div>
+      <button class="btn btn-rd" style="width:100%;padding:.72rem;font-size:.86rem" id="logoutBtn2">🚪 خروج از حساب</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- LOGIN -->
+<div class="mov" id="m-login"><div class="modal">
+  <button class="mc" onclick="cm('login')">✕</button>
+  <h2>ورود به حساب</h2><p class="sub">با ایمیل و رمز عبور وارد شوید</p>
+  <div class="fg"><label class="fl">📧 ایمیل</label><input class="fi" type="email" id="lEmail" placeholder="email@example.com" autocomplete="email"></div>
+  <div class="fg" style="position:relative"><label class="fl">🔒 رمز عبور</label><input class="fi" type="password" id="lPass" placeholder="••••••••" autocomplete="current-password"><button onclick="tp('lPass',this)" style="position:absolute;left:10px;top:32px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.75rem">👁️</button></div>
+  <button class="btn btn-gd" onclick="doLogin()" style="width:100%;padding:.76rem;font-size:.9rem;margin-bottom:.46rem">ورود به حساب</button>
+  <div class="auth-sw">حساب ندارید؟ <a onclick="cm('login');om('register')">ثبت‌نام رایگان کنید</a></div>
+</div></div>
+
+<!-- REGISTER -->
+<div class="mov" id="m-register"><div class="modal">
+  <button class="mc" onclick="cm('register')">✕</button>
+  <h2>ثبت‌نام رایگان</h2><p class="sub">یک بار ثبت‌نام کنید — اطلاعات ذخیره می‌شود</p>
+  <div class="fg"><label class="fl">👤 نام نمایشی</label><input class="fi" type="text" id="rUser" placeholder="نام شما" autocomplete="name"></div>
+  <div class="fg"><label class="fl">📧 ایمیل</label><input class="fi" type="email" id="rEmail" placeholder="email@example.com" autocomplete="email"></div>
+  <div class="fg" style="position:relative"><label class="fl">🔒 رمز عبور <span style="color:var(--muted);font-size:.63rem">(حداقل ۶ کاراکتر)</span></label><input class="fi" type="password" id="rPass" placeholder="••••••••" autocomplete="new-password"><button onclick="tp('rPass',this)" style="position:absolute;left:10px;top:32px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.75rem">👁️</button></div>
+  <div style="background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);border-radius:9px;padding:.62rem .82rem;margin-bottom:.82rem;font-size:.7rem;color:var(--muted);line-height:1.75">✅ اطلاعات در مرورگر ذخیره می‌شود<br>✅ با ایمیل و رمز در هر بار وارد شوید<br>✅ زمین‌ها همیشه در پروفایل شما</div>
+  <button class="btn btn-gd" onclick="doReg()" style="width:100%;padding:.76rem;font-size:.9rem;margin-bottom:.46rem">✅ ایجاد حساب</button>
+  <div class="auth-sw">حساب دارید؟ <a onclick="cm('register');om('login')">وارد شوید</a></div>
+</div></div>
+
+<!-- CONNECT WALLET -->
+<div class="mov" id="m-wallet"><div class="modal" style="max-width:380px">
+  <button class="mc" onclick="cm('wallet')">✕</button>
+  <h2>👛 اتصال کیف پول</h2><p class="sub">کیف پول خود را انتخاب کنید</p>
+  <button class="wopt" id="woMM" style="background:rgba(245,130,49,.07);border-color:rgba(245,130,49,.28)">
+    <div class="wopt-i" style="background:linear-gradient(135deg,#F58231,#E06000)">🦊</div>
+    <div class="wopt-inf"><div class="wopt-n">MetaMask</div><div class="wopt-s">افزونه مرورگر</div></div>
+  </button>
+  <button class="wopt" id="woTrust" style="background:rgba(51,117,255,.07);border-color:rgba(51,117,255,.28)">
+    <div class="wopt-i" style="background:linear-gradient(135deg,#3375FF,#0052CC)">🛡️</div>
+    <div class="wopt-inf"><div class="wopt-n">Trust Wallet</div><div class="wopt-s">آدرس مستقیم</div></div>
+    <div class="wopt-b" style="background:rgba(0,229,160,.13);color:var(--green)">توصیه</div>
+  </button>
+  <div style="border-top:1px solid var(--border);padding-top:.78rem;margin-top:.2rem">
+    <div style="font-size:.7rem;color:var(--muted);margin-bottom:.42rem">یا آدرس مستقیم وارد کنید:</div>
+    <div style="display:flex;gap:.42rem">
+      <input id="dAddr" class="fi" placeholder="0x..." dir="ltr" style="font-size:.74rem;padding:.46rem .68rem">
+      <button class="btn btn-gd btn-sm" onclick="connectDirect()">تأیید</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- BUY CONFIRM -->
+<div class="mov" id="m-buy"><div class="modal">
+  <button class="mc" onclick="cm('buy')">✕</button>
+  <h2>💳 تأیید خرید</h2>
+  <div class="buy-auth" id="buyAuth">
+    <div style="font-size:.76rem;font-weight:700;color:var(--gold);margin-bottom:.62rem">🔐 تأیید هویت برای خرید</div>
+    <div class="fg" style="margin-bottom:.56rem"><label class="fl">📧 ایمیل</label><input class="fi" type="email" id="buyEmail" placeholder="email@example.com"></div>
+    <div class="fg" style="margin-bottom:.35rem;position:relative"><label class="fl">🔒 رمز عبور</label><input class="fi" type="password" id="buyPass" placeholder="••••••••"><button onclick="tp('buyPass',this)" style="position:absolute;left:10px;top:32px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.75rem">👁️</button></div>
+    <div style="font-size:.65rem;color:var(--muted);margin-top:.28rem">ثبت‌نام نکردید؟ <a style="color:var(--gold);cursor:pointer" onclick="cm('buy');om('register')">ثبت‌نام رایگان ←</a></div>
+  </div>
+  <div class="buy-user" id="buyUser">
+    <div><div style="font-size:.65rem;color:var(--muted)">پرداخت از حساب:</div><div style="font-size:.85rem;font-weight:700;color:var(--green)" id="buyUName">–</div><div style="font-size:.65rem;color:var(--muted)" id="buyUEmail">–</div></div>
+    <div style="text-align:left"><div style="font-size:.65rem;color:var(--muted)">موجودی</div><div style="font-size:1.1rem;font-weight:800;color:var(--green)" id="buyBal">–</div><div style="font-size:.62rem;color:var(--muted)">USDT</div></div>
+  </div>
+  <div style="background:var(--card);border-radius:9px;padding:.82rem;margin-bottom:.72rem">
+    <div class="bc-row"><span class="k">🗺️ زمین</span><span class="v" id="bc-team">–</span></div>
+    <div class="bc-row"><span class="k">📐 پیکسل</span><span class="v" id="bc-cnt">0</span></div>
+    <div class="bc-row"><span class="k">📍 موقعیت</span><span class="v" id="bc-pos" style="direction:ltr;font-size:.72rem">–</span></div>
+    <div class="bc-row"><span class="k">💰 قیمت/px</span><span class="v" style="color:var(--green)">1 USDT</span></div>
+    <div class="bc-tot"><span>مجموع</span><span id="bc-tot">0 USDT</span></div>
+  </div>
+  <div id="bcAfter" style="display:flex;justify-content:space-between;font-size:.78rem;padding:.36rem .6rem;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);border-radius:8px;margin-bottom:.72rem">
+    <span style="color:var(--muted)">موجودی بعد از خرید</span>
+    <span style="font-weight:700;color:var(--green)" id="bc-after">–</span>
+  </div>
+  <button class="btn btn-gr" id="confirmBuyBtn" style="width:100%;padding:.8rem;font-size:.9rem;margin-bottom:.4rem">✅ پرداخت و ثبت زمین</button>
+  <button class="btn btn-ol" onclick="cm('buy')" style="width:100%;padding:.6rem;font-size:.82rem">انصراف</button>
+</div></div>
+
+<!-- DEPOSIT -->
+<div class="mov" id="m-deposit"><div class="modal">
+  <button class="mc" onclick="cm('deposit')">✕</button>
+  <h2>⬇️ شارژ کیف پول</h2>
+  <div class="wm-bal"><div style="font-size:.68rem;color:var(--muted);margin-bottom:.15rem">موجودی فعلی</div><div class="wm-n" id="depBal">0</div><div style="font-size:.7rem;color:var(--muted)">USDT</div></div>
+  <p style="font-size:.73rem;color:var(--muted);margin-bottom:.68rem;line-height:1.6">برای واریز USDT واقعی به آدرس زیر ارسال کنید (ERC-20):</p>
+  <div style="background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.24);border-radius:9px;padding:.78rem;margin-bottom:.78rem">
+    <div style="direction:ltr;font-size:.72rem;font-weight:700;color:var(--gold);word-break:break-all;margin-bottom:.36rem">0x98598Caa0F0b67D32503DA73c3719C3514C12643</div>
+    <button class="btn btn-sm btn-ol" onclick="navigator.clipboard.writeText('0x98598Caa0F0b67D32503DA73c3719C3514C12643').then(function(){toast('📋','آدرس کپی شد','');})">📋 کپی</button>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:.76rem">
+    <div style="font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:.48rem">🧪 شارژ آزمایشی:</div>
+    <div class="amt-btns">
+      <button class="amt-btn" onclick="testCharge(100)">+۱۰۰</button>
+      <button class="amt-btn" onclick="testCharge(500)">+۵۰۰</button>
+      <button class="amt-btn" onclick="testCharge(1000)">+۱,۰۰۰</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- WITHDRAW -->
+<div class="mov" id="m-withdraw"><div class="modal">
+  <button class="mc" onclick="cm('withdraw')">✕</button>
+  <h2>⬆️ برداشت USDT</h2>
+  <div class="wm-bal"><div style="font-size:.68rem;color:var(--muted);margin-bottom:.15rem">موجودی قابل برداشت</div><div class="wm-n" id="wdBal">0</div><div style="font-size:.7rem;color:var(--muted)">USDT</div></div>
+  <div class="fg"><label class="fl">آدرس مقصد (ERC-20)</label><input class="fi" type="text" id="wdAddr" placeholder="0x..." dir="ltr"></div>
+  <div class="fg"><label class="fl">مقدار (USDT)</label><input class="fi" type="number" id="wdAmt" placeholder="مثلاً: 100" min="1"></div>
+  <button class="btn btn-gr" onclick="doWithdraw()" style="width:100%;padding:.74rem;font-size:.88rem;margin-bottom:.42rem">⬆️ برداشت</button>
+  <p style="font-size:.64rem;color:var(--muted);text-align:center">⚠️ پرداخت واقعی USDT به آدرس شما ارسال می‌شود</p>
+</div></div>
+
+<div class="toast" id="toast"><span id="t-ic" style="font-size:1rem;flex-shrink:0">✅</span><div><div class="t-ti" id="t-ti"></div><div class="t-m" id="t-m"></div></div></div>
+
+<script>
+// ═══ CONFIG ═══
+const OWNER='0x98598Caa0F0b67D32503DA73c3719C3514C12643';
+const USDT_CA='0xdAC17F958D2ee523a2206206994597C13D831ec7';
+const CW=1000,CH=1000,PX_P=1;
+const DB_K='pxa_db_v3',SES_K='pxa_ses_v3';
+
+// ═══ TEAMS ═══
+const TEAMS=[
+  {id:'real',n:'رئال مادرید',e:'⚪',c:'football',l:'لالیگا',clr:'#D4AF37'},
+  {id:'barca',n:'بارسلونا',e:'🔵',c:'football',l:'لالیگا',clr:'#A50044'},
+  {id:'mancity',n:'منچستر سیتی',e:'🔵',c:'football',l:'پریمیرلیگ',clr:'#6CABDD'},
+  {id:'liverpool',n:'لیورپول',e:'🔴',c:'football',l:'پریمیرلیگ',clr:'#C8102E'},
+  {id:'arsenal',n:'آرسنال',e:'🔴',c:'football',l:'پریمیرلیگ',clr:'#EF0107'},
+  {id:'chelsea',n:'چلسی',e:'🔵',c:'football',l:'پریمیرلیگ',clr:'#034694'},
+  {id:'psg',n:'پاری سن‌ژرمن',e:'🔵',c:'football',l:'لیگ ۱',clr:'#004170'},
+  {id:'bayern',n:'بایرن مونیخ',e:'🔴',c:'football',l:'بوندسلیگا',clr:'#DC052D'},
+  {id:'messi',n:'لیونل مسی',e:'🐐',c:'football',l:'ورزشکاران',clr:'#75AADB'},
+  {id:'ronaldo',n:'کریستیانو رونالدو',e:'🌟',c:'football',l:'ورزشکاران',clr:'#006600'},
+  {id:'mbappe',n:'کیلیان امباپه',e:'⚡',c:'football',l:'ورزشکاران',clr:'#003189'},
+  {id:'haaland',n:'ارلینگ هالند',e:'💪',c:'football',l:'ورزشکاران',clr:'#6CABDD'},
+  {id:'lakers',n:'LA Lakers',e:'💛',c:'basketball',l:'NBA',clr:'#552583'},
+  {id:'bulls',n:'Chicago Bulls',e:'🔴',c:'basketball',l:'NBA',clr:'#CE1141'},
+  {id:'warriors',n:'Golden State',e:'💙',c:'basketball',l:'NBA',clr:'#1D428A'},
+  {id:'celtics',n:'Boston Celtics',e:'🍀',c:'basketball',l:'NBA',clr:'#007A33'},
+  {id:'lebron',n:'لبرون جیمز',e:'👑',c:'basketball',l:'ورزشکاران',clr:'#552583'},
+  {id:'jordan',n:'مایکل جردن',e:'🐐',c:'basketball',l:'ورزشکاران',clr:'#CE1141'},
+  {id:'curry',n:'استفن کاری',e:'🎯',c:'basketball',l:'ورزشکاران',clr:'#1D428A'},
+  {id:'redbull',n:'Red Bull Racing',e:'🐂',c:'formula1',l:'فرمول ۱',clr:'#1E3A5F'},
+  {id:'ferrari',n:'Ferrari F1',e:'🏎️',c:'formula1',l:'فرمول ۱',clr:'#DC0000'},
+  {id:'mercedes',n:'Mercedes AMG',e:'⭐',c:'formula1',l:'فرمول ۱',clr:'#00D2BE'},
+  {id:'mclaren',n:'McLaren',e:'🟠',c:'formula1',l:'فرمول ۱',clr:'#FF8000'},
+  {id:'verstappen',n:'ورستاپن',e:'🏆',c:'formula1',l:'ورزشکاران',clr:'#1E3A5F'},
+  {id:'hamilton',n:'همیلتون',e:'✊',c:'formula1',l:'ورزشکاران',clr:'#00D2BE'},
+  {id:'mj',n:'مایکل جکسون',e:'🕺',c:'celeb',l:'موسیقی',clr:'#212121'},
+  {id:'beyonce',n:'بیانسه',e:'👑',c:'celeb',l:'موسیقی',clr:'#FFD700'},
+  {id:'taylor',n:'تیلور سوئیفت',e:'🎸',c:'celeb',l:'موسیقی',clr:'#7B1FA2'},
+  {id:'elon',n:'ایلان ماسک',e:'🚀',c:'celeb',l:'تکنولوژی',clr:'#1565C0'},
+  {id:'leo',n:'لئوناردو دیکاپریو',e:'🎬',c:'celeb',l:'سینما',clr:'#1565C0'},
+  {id:'dwayne',n:'دووین جانسون',e:'💪',c:'celeb',l:'سینما',clr:'#BF360C'},
+  {id:'faze',n:'FaZe Clan',e:'💀',c:'esports',l:'اسپورت',clr:'#FF0000'},
+  {id:'navi',n:'Natus Vincere',e:'🌟',c:'esports',l:'اسپورت',clr:'#F5A623'},
+  {id:'t1',n:'T1 (Faker)',e:'🎮',c:'esports',l:'اسپورت',clr:'#C8102E'},
+  {id:'g2',n:'G2 Esports',e:'🐺',c:'esports',l:'اسپورت',clr:'#E8173F'},
+];
+
+// ═══ STATE ═══
+var S={
+  page:'home',cat:'all',
+  user:null,
+  wallet:{balance:0,address:'',txs:[]},
+  walletOk:false,provider:null,
+  selected:new Set(),
+  teamOwners:new Map(),
+  lands:[],
+  team:null,
+  zoom:1,panX:0,panY:0,mode:'pan',
+};
+var gImg=null;
+
+// ═══ CANVAS ═══
+var cvs,ctx,mini,mmx;
+var sc=1,ox=0,oy=0;
+var md=false,pan=false,panL=null,dMoved=false,dragStart=null,selR=null;
+var tchs=null,tD=0,tM=false,tSt=null;
+
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded',function(){
+  bind();renderTeams();initCanvas();checkSession();statBar();
+});
+
+function G(id){return document.getElementById(id);}
+function om(id){var e=document.getElementById('m-'+id);if(e)e.classList.add('show');}
+function cm(id){var e=document.getElementById('m-'+id);if(e)e.classList.remove('show');}
+function tp(id,btn){var e=G(id);if(!e)return;e.type=e.type==='password'?'text':'password';btn.textContent=e.type==='password'?'👁️':'🙈';}
+function set(id,v){var e=G(id);if(e)e.textContent=v;}
+
+// ═══ BIND ═══
+function bind(){
+  G('logo').onclick=function(){go('home')};
+  G('nl-home').onclick=function(){go('home')};
+  G('nl-map').onclick=function(){go('map')};
+  G('nl-profile').onclick=function(){go('profile')};
+  G('loginBtn').onclick=function(){om('login')};
+  G('regBtn').onclick=function(){om('register')};
+  G('hMapBtn').onclick=function(){go('map')};
+  G('hWalBtn').onclick=function(){om('wallet')};
+  G('hRegBtn').onclick=function(){om('register')};
+  G('hProfBtn').onclick=function(){go('profile')};
+  G('navBal').onclick=function(){go('profile')};
+  G('mapBack').onclick=function(){go('home')};
+  G('tPan').onclick=function(){setMode('pan')};
+  G('tSel').onclick=function(){setMode('select')};
+  G('tZI').onclick=function(){zAt(1.35)};
+  G('tZO').onclick=function(){zAt(1/1.35)};
+  G('tRst').onclick=function(){S.zoom=1;S.panX=0;S.panY=0;draw()};
+  G('tClr').onclick=function(){clrSel()};
+  G('bpTog').onclick=function(){togBP()};
+  G('bpClr').onclick=function(){clrSel()};
+  G('bpSel').onclick=function(){setMode('select')};
+  G('bpBuy').onclick=function(){openBuy()};
+  G('bpWalRow').onclick=function(){if(!S.walletOk&&!S.user)om('wallet');else go('profile')};
+  G('pConnBtn').onclick=function(){om('wallet')};
+  G('pBuyBtn').onclick=function(){go('map')};
+  G('pDeposit').onclick=function(){openDeposit()};
+  G('pWithdraw').onclick=function(){openWithdraw()};
+  G('logoutBtn').onclick=function(){if(confirm('از حساب خارج شوید؟'))logout()};
+  G('logoutBtn2').onclick=function(){if(confirm('از حساب خارج شوید؟'))logout()};
+  G('woMM').onclick=function(){connectMM()};
+  G('woTrust').onclick=function(){cm('wallet')};
+  G('confirmBuyBtn').onclick=function(){confirmBuy()};
+  document.querySelectorAll('.mov').forEach(function(ov){ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('show')});});
+  G('catTabs').addEventListener('click',function(e){var b=e.target.closest('[data-cat]');if(b)filterCat(b.dataset.cat,b)});
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Enter')return;
+    if(G('m-login').classList.contains('show'))doLogin();
+    else if(G('m-register').classList.contains('show'))doReg();
+    else if(G('m-buy').classList.contains('show'))confirmBuy();
+  });
+}
+
+// ═══ NAVIGATION ═══
+function go(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active')});
+  G('pg-'+p).classList.add('active');
+  document.querySelectorAll('.nav-c a').forEach(function(x){x.classList.remove('on')});
+  var nl=G('nl-'+p);if(nl)nl.classList.add('on');
+  S.page=p;
+  if(p==='profile')buildProfile();
+  if(p==='map')requestAnimationFrame(function(){requestAnimationFrame(function(){rsz();draw();miniDraw()})});
+}
+
+// ═══ AUTH ═══
+function hpw(p){var h=0;for(var i=0;i<p.length;i++)h=Math.imul(31,h)+p.charCodeAt(i)|0;return(h>>>0).toString(16)}
+function getDB(){try{return JSON.parse(localStorage.getItem(DB_K)||'{}')}catch(e){return{}}}
+function setDB(d){try{localStorage.setItem(DB_K,JSON.stringify(d))}catch(e){}}
+function getSes(){try{return JSON.parse(localStorage.getItem(SES_K)||'null')}catch(e){return null}}
+function setSes(s){try{localStorage.setItem(SES_K,JSON.stringify(s))}catch(e){}}
+function clrSes(){localStorage.removeItem(SES_K)}
+function wKey(e){return 'pxa_w_'+e}
+function lKey(e){return 'pxa_l_'+e}
+function saveW(e){try{localStorage.setItem(wKey(e||S.user.email),JSON.stringify(S.wallet))}catch(ex){}}
+function saveD(e){
+  try{
+    var em=e||S.user.email;if(!em)return;
+    localStorage.setItem(lKey(em),JSON.stringify({
+      lands:S.lands,
+      to:[...S.teamOwners.entries()].map(function(e2){return[e2[0],[...e2[1].entries()]]})
+    }));
+  }catch(ex){}
+}
+
+function doReg(){
+  try{
+    var nEl=G('rUser'),eEl=G('rEmail'),pEl=G('rPass');
+    var name=(nEl?nEl.value:'').trim();
+    var email=(eEl?eEl.value:'').trim().toLowerCase();
+    var pass=(pEl?pEl.value:'');
+    function fe(el,msg,sub){
+      if(el){el.style.borderColor='var(--red)';el.style.animation='shake .4s ease';setTimeout(function(){el.style.animation='';el.style.borderColor=''},600)}
+      toast('⚠️',msg,sub||'');
+    }
+    if(!name){fe(nEl,'نام خالی است','نام نمایشی خود را وارد کنید');return}
+    if(!email||!email.includes('@')){fe(eEl,'ایمیل معتبر نیست','مثال: user@gmail.com');return}
+    if(pass.length<6){fe(pEl,'رمز عبور کوتاه است','حداقل ۶ کاراکتر');return}
+    var db=getDB();
+    if(db[email]){fe(eEl,'این ایمیل قبلاً ثبت شده','وارد شوید یا ایمیل دیگری استفاده کنید');return}
+    db[email]={name:name,email:email,pass:hpw(pass),av:'👤',reg:new Date().toLocaleDateString('fa-IR')};
+    setDB(db);
+    G('m-register').classList.remove('show');
+    loginUser(db[email],email,true);
+  }catch(err){toast('❌','خطا در ثبت‌نام',String(err.message||err))}
+}
+
+function doLogin(){
+  try{
+    var eEl=G('lEmail'),pEl=G('lPass');
+    var email=(eEl?eEl.value:'').trim().toLowerCase();
+    var pass=(pEl?pEl.value:'');
+    function fe(el,msg){if(el){el.style.borderColor='var(--red)';el.style.animation='shake .4s ease';setTimeout(function(){el.style.animation='';el.style.borderColor=''},600)}toast('❌',msg,'')}
+    if(!email){fe(eEl,'ایمیل خالی است');return}
+    if(!pass){fe(pEl,'رمز عبور خالی است');return}
+    var db=getDB(),user=db[email];
+    if(!user){fe(eEl,'حسابی با این ایمیل یافت نشد');return}
+    if(user.pass!==hpw(pass)){fe(pEl,'رمز عبور اشتباه است');return}
+    G('m-login').classList.remove('show');
+    loginUser(user,email,false);
+  }catch(err){toast('❌','خطا در ورود',String(err.message||err))}
+}
+
+function loginUser(user,email,isNew){
+  try{
+    S.user={name:user.name,av:user.av||'👤',email:email};
+    setSes({email:email,name:user.name});
+    var saved=null;try{saved=JSON.parse(localStorage.getItem(wKey(email))||'null')}catch(e){}
+    if(saved&&typeof saved.balance==='number'){
+      S.wallet=saved;
+    } else {
+      var h=0;for(var i=0;i<email.length;i++)h=Math.imul(31,h)+email.charCodeAt(i)|0;
+      var hex=(h>>>0).toString(16).padStart(8,'0');
+      S.wallet={balance:0,address:'0x'+hex.repeat(5)+OWNER.slice(-2),txs:[]};
+      saveW(email);
+    }
+    var ld=null;try{ld=JSON.parse(localStorage.getItem(lKey(email))||'null')}catch(e){}
+    if(ld){S.lands=ld.lands||[];S.teamOwners=new Map((ld.to||[]).map(function(e2){return[e2[0],new Map(e2[1])]}))}
+    else{S.lands=[];S.teamOwners=new Map()}
+    updateUI();statBar();renderTeams();
+    toast(isNew?'🎉':'✅',isNew?'خوش آمدید '+user.name+'! 🌟':'خوش آمدید '+user.name+'!',isNew?'حساب شما ساخته شد':'اطلاعات بارگذاری شد');
+  }catch(err){toast('❌','خطا',String(err.message||err))}
+}
+
+function logout(){
+  saveD();
+  S.user=null;S.lands=[];S.teamOwners=new Map();S.selected.clear();
+  S.wallet={balance:0,address:'',txs:[]};S.walletOk=false;S.provider=null;gImg=null;
+  clrSes();updateUI();statBar();renderTeams();if(cvs&&cvs.width>0)draw();
+  toast('👋','از حساب خارج شدید','');go('home');
+}
+
+function checkSession(){
+  var ses=getSes();if(!ses)return;
+  var db=getDB(),user=db[ses.email];if(!user)return;
+  loginUser(user,ses.email,false);
+}
+
+// ═══ WALLET ═══
+function openDeposit(){
+  if(!S.user){toast('⚠️','ابتدا وارد شوید','');om('login');return}
+  set('depBal',S.wallet.balance.toLocaleString());om('deposit');
+}
+function openWithdraw(){
+  if(!S.user){toast('⚠️','ابتدا وارد شوید','');om('login');return}
+  set('wdBal',S.wallet.balance.toLocaleString());G('wdAddr').value='';G('wdAmt').value='';om('withdraw');
+}
+function doWithdraw(){
+  var addr=(G('wdAddr').value||'').trim();
+  var amt=parseFloat(G('wdAmt').value)||0;
+  if(!addr||!addr.startsWith('0x')){G('wdAddr').style.borderColor='var(--red)';toast('⚠️','آدرس نامعتبر','');return}
+  if(amt<=0){G('wdAmt').style.borderColor='var(--red)';toast('⚠️','مقدار نامعتبر','');return}
+  if(amt>S.wallet.balance){G('wdAmt').style.borderColor='var(--red)';toast('❌','موجودی کافی نیست','');return}
+  S.wallet.balance=+(S.wallet.balance-amt).toFixed(2);
+  addTx('out','⬆️ برداشت به '+addr.slice(0,10)+'...',-amt);
+  saveW();updateUI();cm('withdraw');
+  toast('✅',amt.toLocaleString()+' USDT برداشت شد','موجودی: $'+S.wallet.balance.toLocaleString());
+  if(S.page==='profile')buildProfile();
+}
+function testCharge(amt){
+  if(!S.user){toast('⚠️','ابتدا وارد شوید','');om('login');return}
+  S.wallet.balance=+(S.wallet.balance+amt).toFixed(2);
+  addTx('in','🧪 شارژ آزمایشی',+amt);
+  saveW();updateUI();cm('deposit');
+  toast('✅',amt.toLocaleString()+' USDT شارژ شد!','موجودی: $'+S.wallet.balance.toLocaleString());
+  if(S.page==='profile')buildProfile();
+}
+function addTx(type,desc,amt){
+  S.wallet.txs.unshift({type:type,desc:desc,amt:amt,date:new Date().toLocaleDateString('fa-IR'),bal:S.wallet.balance});
+  if(S.wallet.txs.length>100)S.wallet.txs=S.wallet.txs.slice(0,100);
+}
+
+// ═══ CONNECT WALLET ═══
+async function connectMM(){
+  cm('wallet');
+  if(!window.ethereum){toast('🦊','MetaMask یافت نشد','');setTimeout(function(){window.open('https://metamask.io/download/','_blank')},1200);return}
+  try{
+    await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x1'}]});
+    var accs=await window.ethereum.request({method:'eth_requestAccounts'});
+    if(accs[0]){S.walletOk=true;S.wallet.address=accs[0];S.provider='metamask';updateUI();toast('✅','MetaMask متصل شد!',accs[0].slice(0,6)+'...'+accs[0].slice(-4))}
+  }catch(e){toast('❌','خطا',e.message||'')}
+}
+function connectDirect(){
+  var a=(G('dAddr').value||'').trim();
+  if(!a||!a.startsWith('0x')||a.length!==42){toast('⚠️','آدرس نامعتبر','');return}
+  S.walletOk=true;S.wallet.address=a;S.provider='trust';
+  cm('wallet');updateUI();toast('✅','کیف پول متصل شد!',a.slice(0,6)+'...'+a.slice(-4));
+}
+
+// ═══ UI ═══
+function updateUI(){
+  var ok=!!S.user;
+  G('loginBtn').style.display=ok?'none':'';
+  G('regBtn').style.display=ok?'none':'';
+  var nb=G('navBal');
+  if(ok){nb.style.display='flex';set('navBalAmt',S.wallet.balance.toLocaleString()+' USDT')}
+  else nb.style.display='none';
+  var bw=G('bpWalAmt');if(bw)bw.textContent=ok?(S.wallet.balance.toLocaleString()+' USDT'):'اتصال نشده';
+  if(ok&&S.walletOk){var b=G('pBWal');if(b)b.style.display=''}
+  if(ok&&S.lands.length){var b2=G('pBLand');if(b2)b2.style.display=''}
+  var av=G('hpAv');if(av)av.textContent=S.user?(S.user.av||'👤'):'👤';
+  var dot=G('hpDot');if(dot)dot.style.display=(ok&&S.lands.length)?'':'none';
+  var sub=G('hpSub');if(sub)sub.textContent=ok?('موجودی: $'+S.wallet.balance.toLocaleString()+' · '+S.lands.length+' زمین'):'زمین‌ها و تراکنش‌های شما';
+  var pb=G('profBal');if(pb)pb.textContent=ok?S.wallet.balance.toLocaleString():'–';
+  var pr=G('pp-rem');if(pr)pr.textContent=ok?'$'+S.wallet.balance.toLocaleString():'–';
+}
+
+// ═══ TEAMS ═══
+function renderTeams(){
+  var grid=G('tgrid');if(!grid)return;
+  var list=S.cat==='all'?TEAMS:TEAMS.filter(function(t){return t.c===S.cat});
+  grid.innerHTML=list.map(function(t){
+    var sold=S.lands.filter(function(l){return l.tid===t.id}).reduce(function(a,l){return a+l.px},0);
+    var toPx=(S.teamOwners.get(t.id)||new Map()).size;
+    return'<div class="tcard" data-tid="'+t.id+'">'
+      +'<span class="te">'+t.e+'</span>'
+      +'<div class="tn">'+t.n+'</div>'
+      +'<div class="tm">'+t.l+'</div>'
+      +'<div class="tp">🗺️ '+(toPx>0?toPx.toLocaleString()+' / 1M':'زمین اختصاصی')+'</div>'
+      +(toPx===0?'<div class="tf">✨ اولین خریدار باش!</div>':'')
+    +'</div>';
+  }).join('');
+  grid.onclick=function(e){var c=e.target.closest('[data-tid]');if(c)openMap(c.dataset.tid)};
+}
+function filterCat(cat,el){
+  S.cat=cat;
+  document.querySelectorAll('.ctab').forEach(function(t){t.classList.remove('on')});
+  el.classList.add('on');renderTeams();
+}
+function openMap(id){
+  var t=TEAMS.find(function(x){return x.id===id});if(!t)return;
+  if(!S.team||S.team.id!==id){S.zoom=1;S.panX=0;S.panY=0;S.selected.clear()}
+  S.team=t;
+  G('mapTitle').innerHTML='🗺️ <span>'+t.e+' '+t.n+'</span>';
+  go('map');
+}
+function curOwn(){return S.teamOwners.get(S.team?S.team.id:'')||new Map()}
+function setPixel(tid,k,v){if(!S.teamOwners.has(tid))S.teamOwners.set(tid,new Map());S.teamOwners.get(tid).set(k,v)}
+
+// ═══ CANVAS ═══
+function initCanvas(){
+  cvs=G('cvs');ctx=cvs.getContext('2d');mini=G('mini');mmx=mini.getContext('2d');
+  cvs.addEventListener('mousedown',onMD);cvs.addEventListener('mousemove',onMM);cvs.addEventListener('mouseup',onMU);
+  cvs.addEventListener('mouseleave',function(){G('coord').innerHTML='📐 <span>–</span>'});
+  cvs.addEventListener('wheel',onWH,{passive:false});
+  cvs.addEventListener('touchstart',onTS,{passive:false});cvs.addEventListener('touchmove',onTM,{passive:false});cvs.addEventListener('touchend',onTE);
+  window.addEventListener('resize',function(){rsz();draw()});
+}
+function rsz(){var w=G('canvasWrap');if(!w||!cvs)return;var W=w.offsetWidth,H=w.offsetHeight;if(W>0&&H>0){cvs.width=W;cvs.height=H}calcSc()}
+function calcSc(){sc=Math.min((cvs.width-6)/CW,(cvs.height-6)/CH)*S.zoom;ox=(cvs.width-CW*sc)/2+S.panX;oy=(cvs.height-CH*sc)/2+S.panY}
+
+function draw(){
+  if(!ctx||!cvs||cvs.width===0||cvs.height===0){rsz();return}
+  calcSc();
+  ctx.clearRect(0,0,cvs.width,cvs.height);ctx.fillStyle='#030508';ctx.fillRect(0,0,cvs.width,cvs.height);
+  var x0=Math.max(0,Math.floor(-ox/sc)),x1=Math.min(CW,Math.ceil((cvs.width-ox)/sc));
+  var y0=Math.max(0,Math.floor(-oy/sc)),y1=Math.min(CH,Math.ceil((cvs.height-oy)/sc));
+  var ps=Math.max(sc,.5);
+  for(var y=y0;y<y1;y++)for(var x=x0;x<x1;x++){
+    var k=x+','+y,sx=ox+x*sc,sy=oy+y*sc,col;
+    if(S.selected.has(k))col='#FF6B00';
+    else if(curOwn().has(k)){var isMe=curOwn().get(k).uid===(S.user?S.user.email:null);col=isMe?(gImg?null:'#00E5A0'):'#c0392b'}
+    else col='#1a2436';
+    if(col!==null){ctx.fillStyle=col;ctx.fillRect(sx,sy,ps,ps)}
+    if(sc>9&&col!==null){ctx.strokeStyle='rgba(0,0,0,.14)';ctx.lineWidth=.2;ctx.strokeRect(sx,sy,ps,ps)}
+  }
+  if(gImg&&S.user){
+    var myK=[];curOwn().forEach(function(own,k){if(own.uid===S.user.email)myK.push(k)});
+    if(myK.length){
+      var pxs=myK.map(function(k){return+k.split(',')[0]}),pys=myK.map(function(k){return+k.split(',')[1]});
+      var mnx=Math.min.apply(null,pxs),mxx=Math.max.apply(null,pxs),mny=Math.min.apply(null,pys),mxy=Math.max.apply(null,pys);
+      ctx.save();ctx.beginPath();
+      myK.forEach(function(k){var p=k.split(',');var sx2=ox+(+p[0])*sc,sy2=oy+(+p[1])*sc;if(sx2+ps>0&&sy2+ps>0&&sx2<cvs.width&&sy2<cvs.height)ctx.rect(sx2,sy2,ps,ps)});
+      ctx.clip();ctx.drawImage(gImg,ox+mnx*sc,oy+mny*sc,(mxx-mnx+1)*sc,(mxy-mny+1)*sc);ctx.restore();
+    }
+  }
+  if(S.team){ctx.fillStyle=S.team.clr+'0B';ctx.fillRect(ox,oy,CW*sc,CH*sc)}
+  if(selR&&dMoved){
+    var rx=ox+selR.x*sc,ry=oy+selR.y*sc,rw=selR.w*sc,rh=selR.h*sc;
+    ctx.fillStyle='rgba(255,107,0,.1)';ctx.fillRect(rx,ry,rw,rh);
+    ctx.strokeStyle='#FF6B00';ctx.lineWidth=2;ctx.setLineDash([5,3]);ctx.strokeRect(rx,ry,rw,rh);ctx.setLineDash([]);
+    var cnt=selR.w*selR.h;ctx.font='bold '+(Math.max(12,Math.min(16,sc*3)))+'px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(0,0,0,.72)';var tw=ctx.measureText(cnt.toLocaleString()+' px').width;
+    ctx.beginPath();ctx.roundRect(rx+rw/2-tw/2-5,ry+rh/2-9,tw+10,18,4);ctx.fill();
+    ctx.fillStyle='#FF6B00';ctx.fillText(cnt.toLocaleString()+' px',rx+rw/2,ry+rh/2);ctx.textBaseline='alphabetic';
+  }
+  miniDraw();
+}
+
+function miniDraw(){
+  if(!mmx)return;var mw=mini.width,mh=mini.height;mmx.fillStyle='#030508';mmx.fillRect(0,0,mw,mh);
+  var pw=Math.max(1,Math.ceil(2/CW*mw));
+  curOwn().forEach(function(own,k){var p=k.split(',');mmx.fillStyle=own.uid===(S.user?S.user.email:null)?'#00E5A0':'#c0392b';mmx.fillRect((+p[0])/CW*mw,(+p[1])/CH*mh,pw,pw)});
+  if(gImg&&S.user){
+    var myK=[];curOwn().forEach(function(own,k){if(own.uid===S.user.email)myK.push(k)});
+    if(myK.length){var pxs=myK.map(function(k){return+k.split(',')[0]}),pys=myK.map(function(k){return+k.split(',')[1]});var mnx=Math.min.apply(null,pxs),mxx=Math.max.apply(null,pxs),mny=Math.min.apply(null,pys),mxy=Math.max.apply(null,pys);mmx.save();mmx.beginPath();myK.forEach(function(k){var p=k.split(',');mmx.rect((+p[0])/CW*mw,(+p[1])/CH*mh,pw,pw)});mmx.clip();mmx.drawImage(gImg,mnx/CW*mw,mny/CH*mh,(mxx-mnx+1)/CW*mw,(mxy-mny+1)/CH*mh);mmx.restore()}
+  }
+  var vx=(-ox/sc)/CW*mw,vy=(-oy/sc)/CH*mh,vw=(cvs.width/sc)/CW*mw,vh=(cvs.height/sc)/CH*mh;
+  mmx.strokeStyle='#D4AF37';mmx.lineWidth=1.4;mmx.strokeRect(vx,vy,vw,vh);
+}
+
+// ═══ MOUSE / TOUCH ═══
+function getPx(e){var r=cvs.getBoundingClientRect();return{px:Math.floor((e.clientX-r.left-ox)/sc),py:Math.floor((e.clientY-r.top-oy)/sc),mx:e.clientX,my:e.clientY}}
+function onMD(e){if(e.button===1)return;md=true;dMoved=false;pan=false;selR=null;dragStart=null;if(S.mode==='pan'){pan=true;panL={x:e.clientX,y:e.clientY};cvs.style.cursor='grabbing'}else{var p=getPx(e);dragStart={px:p.px,py:p.py}}}
+function onMM(e){
+  var p=getPx(e);if(p.px>=0&&p.px<CW&&p.py>=0&&p.py<CH)G('coord').innerHTML='📐 <span>('+p.px+','+p.py+')</span>';
+  if(md){if(pan&&panL){S.panX+=e.clientX-panL.x;S.panY+=e.clientY-panL.y;panL={x:e.clientX,y:e.clientY};draw();return}
+    if(S.mode==='select'&&dragStart){dMoved=true;var x=Math.min(dragStart.px,p.px),y=Math.min(dragStart.py,p.py);selR={x:x,y:y,w:Math.abs(p.px-dragStart.px)+1,h:Math.abs(p.py-dragStart.py)+1};draw()}}
+  cvs.style.cursor=S.mode==='pan'?(md?'grabbing':'grab'):'crosshair';
+}
+function onMU(e){
+  if(!md)return;md=false;if(pan){pan=false;panL=null;cvs.style.cursor='grab';return}
+  var p=getPx(e);
+  if(S.mode==='select'){
+    if(dMoved&&selR){var cnt=0;for(var r=selR.y;r<selR.y+selR.h;r++)for(var c=selR.x;c<selR.x+selR.w;c++){if(c<0||c>=CW||r<0||r>=CH)continue;var k=c+','+r;if(!curOwn().has(k)){S.selected.add(k);cnt++}}if(cnt)toast('✅',cnt.toLocaleString()+' پیکسل انتخاب شد','برای خرید روی دکمه خرید کلیک کنید')}
+    else if(!dMoved&&p.px>=0&&p.px<CW&&p.py>=0&&p.py<CH){var k2=p.px+','+p.py;if(!curOwn().has(k2)){if(S.selected.has(k2))S.selected.delete(k2);else S.selected.add(k2)}}
+    updSel();
+  }
+  selR=null;dMoved=false;dragStart=null;draw();
+}
+function onWH(e){e.preventDefault();var r=cvs.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,wx=(mx-ox)/sc,wy=(my-oy)/sc;S.zoom=Math.max(.15,Math.min(40,S.zoom*(e.deltaY<0?1.16:.86)));calcSc();S.panX+=mx-(ox+wx*sc);S.panY+=my-(oy+wy*sc);draw()}
+function onTS(e){e.preventDefault();tM=false;selR=null;tSt=null;if(e.touches.length===1){var t=e.touches[0];tchs={x:t.clientX,y:t.clientY};if(S.mode==='select'){var r=cvs.getBoundingClientRect();tSt={px:Math.floor((t.clientX-r.left-ox)/sc),py:Math.floor((t.clientY-r.top-oy)/sc)}}}else if(e.touches.length===2){tD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);tchs=null;tSt=null}}
+function onTM(e){e.preventDefault();if(e.touches.length===1&&tchs){var t=e.touches[0];var dx=t.clientX-tchs.x,dy=t.clientY-tchs.y;if(Math.abs(dx)>3||Math.abs(dy)>3)tM=true;if(S.mode==='select'&&tSt&&tM){var r=cvs.getBoundingClientRect();var px=Math.floor((t.clientX-r.left-ox)/sc),py=Math.floor((t.clientY-r.top-oy)/sc);selR={x:Math.min(tSt.px,px),y:Math.min(tSt.py,py),w:Math.abs(px-tSt.px)+1,h:Math.abs(py-tSt.py)+1};draw()}else if(S.mode==='pan'&&tM){S.panX+=dx;S.panY+=dy;tchs={x:t.clientX,y:t.clientY};draw()}}else if(e.touches.length===2){var cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(tD>0){var r2=cvs.getBoundingClientRect();var mx=cx-r2.left,my=cy-r2.top;var wx=(mx-ox)/sc,wy=(my-oy)/sc;S.zoom=Math.max(.15,Math.min(40,S.zoom*(d/tD)));calcSc();S.panX+=mx-(ox+wx*sc);S.panY+=my-(oy+wy*sc);draw()}tD=d;tM=true}}
+function onTE(e){if(S.mode==='select'){if(tM&&selR){var cnt=0;for(var r=selR.y;r<selR.y+selR.h;r++)for(var c=selR.x;c<selR.x+selR.w;c++){if(c<0||c>=CW||r<0||r>=CH)continue;var k=c+','+r;if(!curOwn().has(k)){S.selected.add(k);cnt++}}if(cnt)toast('✅',cnt.toLocaleString()+' پیکسل انتخاب شد','');updSel()}else if(!tM&&e.changedTouches.length===1){var t=e.changedTouches[0];var r=cvs.getBoundingClientRect();var px=Math.floor((t.clientX-r.left-ox)/sc),py=Math.floor((t.clientY-r.top-oy)/sc);var k2=px+','+py;if(px>=0&&px<CW&&py>=0&&py<CH&&!curOwn().has(k2)){if(S.selected.has(k2))S.selected.delete(k2);else S.selected.add(k2);updSel()}}}selR=null;tchs=null;tM=false;tSt=null;draw()}
+function zAt(f){var cx=cvs.width/2,cy=cvs.height/2,wx=(cx-ox)/sc,wy=(cy-oy)/sc;S.zoom=Math.max(.15,Math.min(40,S.zoom*f));calcSc();S.panX+=cx-(ox+wx*sc);S.panY+=cy-(oy+wy*sc);draw()}
+
+// ═══ MODE & SEL ═══
+function setMode(m){S.mode=m;G('tPan').classList.toggle('on',m==='pan');G('tSel').classList.toggle('on',m==='select');G('bpSel').classList.toggle('on',m==='select');if(cvs)cvs.style.cursor=m==='select'?'crosshair':'grab';toast(m==='select'?'⬜':'✋',m==='select'?'حالت انتخاب: کلیک یا بکشید':'حالت جابجایی: کشیدن=پن','')}
+function updSel(){
+  var n=S.selected.size,arr=[...S.selected],tot=n*PX_P;
+  set('bpCnt',n.toLocaleString());
+  G('bpTot').innerHTML='$'+tot.toLocaleString()+' <small>USDT</small>';
+  set('bpTeam',S.team?S.team.e+' '+S.team.n:'–');
+  set('bpPos',arr.length?'('+arr[0]+')':'–');
+  if(n>0)G('bpanel').classList.remove('hidden');
+  var bw=G('bpWalAmt');if(bw)bw.textContent=S.user?(S.wallet.balance.toLocaleString()+' USDT'):'اتصال نشده';
+}
+function clrSel(){S.selected.clear();selR=null;updSel();draw()}
+var bpOpen=true;
+function togBP(){bpOpen=!bpOpen;G('bpBody').style.display=bpOpen?'':'none';G('bpTog').textContent=bpOpen?'▼':'▲'}
+
+// ═══ BUY ═══
+function openBuy(){
+  if(!S.selected.size){toast('ℹ️','پیکسلی انتخاب نشده','حالت ⬜ انتخاب را فعال کنید');return}
+  var n=S.selected.size,tot=n*PX_P,arr=[...S.selected],fx=arr[0].split(',')[0],fy=arr[0].split(',')[1];
+  set('bc-team',S.team?S.team.e+' '+S.team.n:'–');set('bc-cnt',n.toLocaleString());set('bc-pos','('+fx+','+fy+')');set('bc-tot',tot.toLocaleString()+' USDT');
+  if(S.user){
+    G('buyAuth').style.display='none';G('buyUser').style.display='flex';
+    set('buyUName',S.user.name);set('buyUEmail',S.user.email);set('buyBal',S.wallet.balance.toLocaleString());
+    set('bc-after',(S.wallet.balance-tot).toLocaleString()+' USDT');G('bcAfter').style.display='flex';
+    G('confirmBuyBtn').textContent=S.wallet.balance<tot?'❌ موجودی کافی نیست':'✅ پرداخت و ثبت زمین';
+    G('confirmBuyBtn').style.opacity=S.wallet.balance<tot?'.55':'1';
+  } else {
+    G('buyAuth').style.display='';G('buyUser').style.display='none';G('bcAfter').style.display='none';
+    G('buyEmail').value='';G('buyPass').value='';
+    G('confirmBuyBtn').textContent='🔐 تأیید هویت و خرید';G('confirmBuyBtn').style.opacity='1';
+  }
+  om('buy');
+}
+function confirmBuy(){
+  var n=S.selected.size,tot=n*PX_P;if(!n)return;
+  var user=S.user;
+  if(!user){
+    var email=(G('buyEmail').value||'').trim().toLowerCase();
+    var pass=(G('buyPass').value||'');
+    function fe2(el,msg){if(el){el.style.borderColor='var(--red)';el.style.animation='shake .4s ease';setTimeout(function(){el.style.animation='';el.style.borderColor=''},600)}toast('❌',msg,'')}
+    if(!email){fe2(G('buyEmail'),'ایمیل خالی است');return}
+    if(!pass){fe2(G('buyPass'),'رمز عبور خالی است');return}
+    var db=getDB(),u=db[email];
+    if(!u){fe2(G('buyEmail'),'حساب یافت نشد');return}
+    if(u.pass!==hpw(pass)){fe2(G('buyPass'),'رمز اشتباه است');return}
+    loginUser(u,email,false);user=S.user;
+  }
+  if(S.wallet.balance<tot){toast('❌','موجودی کافی نیست','نیاز: $'+tot+' · موجودی: $'+S.wallet.balance);cm('buy');setTimeout(openDeposit,400);return}
+  var arr=[...S.selected],lnk=(G('bpLink').value||'').trim();
+  var t=S.team||{id:'gen',n:'عمومی',e:'🌐',clr:'#D4AF37',l:'سایر'};
+  var fx=arr[0].split(',')[0],fy=arr[0].split(',')[1];
+  S.wallet.balance=+(S.wallet.balance-tot).toFixed(2);
+  addTx('buy','🗺️ خرید '+n.toLocaleString()+' px — '+t.e+' '+t.n,-tot);
+  arr.forEach(function(k){setPixel(t.id,k,{uid:user.email,link:lnk,tid:t.id,clr:t.clr,name:user.name})});
+  S.lands.push({id:Date.now(),tid:t.id,n:t.n,e:t.e,clr:t.clr,l:t.l,px:n,paid:tot,link:lnk,pos:fx+','+fy,date:new Date().toLocaleDateString('fa-IR'),keys:arr});
+  S.selected.clear();updSel();draw();statBar();renderTeams();saveW();saveD();updateUI();cm('buy');
+  toast('✅',n.toLocaleString()+' پیکسل خریداری شد! 🎉','موجودی: $'+S.wallet.balance.toLocaleString());
+  setTimeout(function(){go('profile')},1800);
+}
+
+// ═══ PROFILE ═══
+function pTab(el){
+  var tab=el.dataset.tab;
+  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on')});
+  el.classList.add('on');
+  document.querySelectorAll('.ptab-c').forEach(function(d){d.style.display='none'});
+  var tc=G('ptab-'+tab);if(tc)tc.style.display='';
+  if(tab==='txs')buildAllTx();
+  if(tab==='acc')buildAcc();
+  if(tab==='lands')buildLGrid();
+}
+function buildProfile(){
+  if(!S.user){toast('⚠️','ابتدا وارد شوید','');go('home');return}
+  set('pName',S.user.name);set('pSub',S.user.email);G('pAv').textContent=S.user.av||'👤';
+  if(S.lands.length)G('pBLand').style.display='';
+  if(S.walletOk||S.wallet.address)G('pBWal').style.display='';
+  var tp=S.lands.reduce(function(a,l){return a+l.px},0),tv=S.lands.reduce(function(a,l){return a+l.paid},0);
+  set('pp-px',tp.toLocaleString());set('pp-val','$'+tv.toLocaleString());set('pp-cnt',S.lands.length);
+  set('pp-rem','$'+S.wallet.balance.toLocaleString());set('profBal',S.wallet.balance.toLocaleString());
+  var dot=G('hpDot');if(dot)dot.style.display=S.lands.length?'':'none';
+  var sub=G('hpSub');if(sub)sub.textContent='موجودی: $'+S.wallet.balance.toLocaleString()+' · '+S.lands.length+' زمین';
+  buildTxMini();buildLGrid();
+}
+function txRow(tx){
+  var cl=tx.type==='in'?'in':tx.type==='out'?'out':'buy';
+  var ic=tx.type==='in'?'⬇️':tx.type==='out'?'⬆️':'💳';
+  return'<div class="tx-item"><div class="tx-ic '+cl+'">'+ic+'</div><div class="tx-inf"><div class="tx-desc">'+tx.desc+'</div><div class="tx-date">'+tx.date+' · '+(tx.bal||0).toLocaleString()+' USDT</div></div><div class="tx-amt '+cl+'">'+(tx.amt>0?'+':'')+(tx.amt||0).toLocaleString()+' USDT</div></div>';
+}
+function buildTxMini(){var el=G('txMini');if(!el)return;var txs=S.wallet.txs||[];el.innerHTML=txs.length?txs.slice(0,3).map(txRow).join(''):'<div style="text-align:center;color:var(--muted);font-size:.76rem;padding:1rem">هنوز تراکنشی ندارید</div>'}
+function buildAllTx(){var el=G('txAll');if(!el)return;var txs=S.wallet.txs||[];el.innerHTML=txs.length?txs.map(txRow).join(''):'<div style="text-align:center;color:var(--muted);font-size:.78rem;padding:2rem">هنوز تراکنشی ندارید</div>'}
+function buildAcc(){
+  var db=getDB(),user=S.user?db[S.user.email]:null;
+  set('acc-name',S.user?S.user.name:'–');set('acc-email',S.user?S.user.email:'–');set('acc-reg',user?user.reg:'–');
+  var addr=S.wallet.address||'–';set('acc-addr',addr.length>20?addr.slice(0,12)+'...'+addr.slice(-8):addr);
+  var tp=S.lands.reduce(function(a,l){return a+l.px},0),tv=S.lands.reduce(function(a,l){return a+l.paid},0);
+  set('acc-px',tp.toLocaleString());set('acc-bal',S.wallet.balance.toLocaleString());set('acc-lands',S.lands.length);set('acc-spent','$'+tv.toLocaleString());
+}
+
+// ═══ LAND GRID + IMAGE ═══
+function buildLGrid(){
+  var grid=G('lgrid');if(!grid)return;
+  if(!S.lands.length){grid.innerHTML='<div style="color:var(--muted);font-size:.78rem;padding:1.5rem;grid-column:1/-1;text-align:center">هنوز زمینی ندارید · <a style="color:var(--gold);cursor:pointer" onclick="go(\'home\')">اولین زمین را بخرید ←</a></div>';return}
+  grid.innerHTML=S.lands.map(function(land){
+    return'<div class="lcard">'
+      +'<div style="position:relative">'
+        +'<canvas class="lc-cv" id="lcc-'+land.id+'"></canvas>'
+        +'<label style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.72);border:1px solid rgba(212,175,55,.38);border-radius:6px;padding:.2rem .52rem;font-size:.62rem;font-weight:600;color:var(--gold);cursor:pointer;display:inline-flex;align-items:center;gap:3px">'
+          +'📷 عکس<input type="file" accept="image/*" style="display:none" onchange="handleLandImg(event,\''+land.id+'\')">'
+        +'</label>'
+      +'</div>'
+      +'<div class="lc-body">'
+        +'<div class="lc-name">'+land.e+' '+land.n+'</div>'
+        +'<div class="lc-px">'+land.px.toLocaleString()+' پیکسل · $'+land.paid.toLocaleString()+'</div>'
+        +'<div class="lc-acts">'
+          +'<button class="btn btn-ol btn-sm" style="font-size:.66rem;flex:1" data-goto="'+land.tid+'">🗺️ مشاهده</button>'
+          +(gImg||land._img?'<button class="btn btn-rd btn-sm" style="font-size:.62rem" onclick="clearLImg(\''+land.id+'\')">🗑️</button>':'')
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  grid.querySelectorAll('[data-goto]').forEach(function(b){b.onclick=function(){var t=TEAMS.find(function(x){return x.id===b.dataset.goto});if(t)openMap(t.id)}});
+  setTimeout(function(){S.lands.forEach(function(land){var cv=G('lcc-'+land.id);if(cv)rndLand(land,cv)})},60);
+}
+function rndLand(land,cv){
+  if(!cv||!land.keys||!land.keys.length)return;
+  var g2=cv.getContext('2d'),W=cv.width=cv.offsetWidth||235,H=cv.height=145;
+  var pxs=land.keys.map(function(k){return+k.split(',')[0]}),pys=land.keys.map(function(k){return+k.split(',')[1]});
+  var mnx=Math.min.apply(null,pxs),mxx=Math.max.apply(null,pxs),mny=Math.min.apply(null,pys),mxy=Math.max.apply(null,pys);
+  var rw=mxx-mnx+1,rh=mxy-mny+1,s=Math.min((W-4)/rw,(H-24)/rh);
+  var bx=(W-rw*s)/2,by=((H-24)-rh*s)/2;
+  g2.fillStyle='#030508';g2.fillRect(0,0,W,H);
+  var img=land._img||gImg||null;
+  if(img){
+    g2.save();g2.beginPath();
+    land.keys.forEach(function(k){var p=k.split(',');g2.rect(bx+(+p[0]-mnx)*s,by+(+p[1]-mny)*s,Math.max(s,.5),Math.max(s,.5))});
+    g2.clip();g2.drawImage(img,bx,by,rw*s,rh*s);g2.restore();
+    g2.strokeStyle=land.clr;g2.lineWidth=1.5;g2.strokeRect(bx,by,rw*s,rh*s);
+  } else {
+    g2.fillStyle='#00E5A0';
+    land.keys.forEach(function(k){var p=k.split(',');g2.fillRect(bx+(+p[0]-mnx)*s,by+(+p[1]-mny)*s,Math.max(s,.5),Math.max(s,.5))});
+  }
+  g2.fillStyle='rgba(0,0,0,.6)';g2.fillRect(0,H-22,W,22);
+  g2.fillStyle='#fff';g2.font='bold 9px sans-serif';g2.textAlign='center';
+  g2.fillText(land.e+' '+land.n+' · '+land.keys.length.toLocaleString()+' px',W/2,H-7);
+}
+function handleImgSel(e){var f=e.target&&e.target.files&&e.target.files[0];if(f)loadImg(f,null)}
+function handleDrop(e){var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImg(f,null)}
+function handleLandImg(e,lid){var f=e.target&&e.target.files&&e.target.files[0];if(f)loadImg(f,lid)}
+function loadImg(file,landId){
+  if(!S.lands.length){toast('ℹ️','هنوز زمینی ندارید','ابتدا زمین بخرید');return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      if(landId){var land=S.lands.find(function(l){return String(l.id)===String(landId)});if(land){land._img=img;if(!gImg)gImg=img}}
+      else{
+        gImg=img;
+        var px=S.lands.reduce(function(a,l){return a+l.px},0).toLocaleString();
+        var st=G('upStatus');if(st){st.style.display='';st.textContent='✅ عکس اعمال شد روی '+px+' پیکسل'}
+        var cb=G('clearImgBtn');if(cb)cb.style.display='';
+        var ui=G('upIcon');if(ui)ui.textContent='✅';
+        var ut=G('upTitle');if(ut)ut.textContent='عکس آپلود شده';
+      }
+      buildLGrid();if(cvs&&cvs.width>0)draw();
+      toast('✅','عکس آپلود شد!','جایگزین رنگ سبز زمین‌های شما شد');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function clearGImg(){
+  gImg=null;S.lands.forEach(function(l){l._img=null});
+  var cb=G('clearImgBtn');if(cb)cb.style.display='none';
+  var st=G('upStatus');if(st)st.style.display='none';
+  var ui=G('upIcon');if(ui)ui.textContent='🖼️';
+  var ut=G('upTitle');if(ut)ut.textContent='آپلود عکس از گالری روی زمین‌ها';
+  var inp=G('gImgIn');if(inp)inp.value='';
+  buildLGrid();if(cvs&&cvs.width>0)draw();toast('🗑️','عکس حذف شد','');
+}
+function clearLImg(lid){var land=S.lands.find(function(l){return String(l.id)===String(lid)});if(land)land._img=null;buildLGrid();if(cvs&&cvs.width>0)draw()}
+
+// ═══ STATS ═══
+function statBar(){var tot=0;S.teamOwners.forEach(function(m){tot+=m.size});set('sn-sold',tot.toLocaleString());set('sn-free',(1000000-tot).toLocaleString())}
+
+// ═══ TOAST ═══
+var _tt;
+function toast(ic,ti,m){
+  clearTimeout(_tt);set('t-ic',ic);set('t-ti',ti);set('t-m',m);
+  var t=G('toast');t.classList.add('show');_tt=setTimeout(function(){t.classList.remove('show')},3500);
+}
+</script>
+</body>
+</html>
