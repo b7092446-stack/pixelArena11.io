@@ -1,0 +1,10 @@
+const express = require('express');
+const ctrl = require('../controllers/paymentController');
+const { protect } = require('../middleware/auth');
+const { paymentLimiter } = require('../middleware/rateLimiter');
+const router = express.Router();
+router.use(protect);
+router.post('/verify', paymentLimiter, ctrl.verifyPayment);
+router.get('/status/:txHash', ctrl.paymentStatus);
+router.get('/my-transactions', ctrl.myTransactions);
+module.exports = router;

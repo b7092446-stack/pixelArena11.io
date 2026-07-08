@@ -1,0 +1,15 @@
+{
+  "name": "PixelArena",
+  "short_name": "PixelArena",
+  "description": "بزرگترین بازار ۱٬۰۰۰٬۰۰۰ پیکسلی جهان - 1 Pixel = 1 USDT",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090F",
+  "theme_color": "#D4AF37",
+  "dir": "rtl",
+  "lang": "fa",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

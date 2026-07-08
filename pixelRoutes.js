@@ -1,0 +1,11 @@
+const express = require('express');
+const ctrl = require('../controllers/pixelController');
+const { protect, optionalAuth } = require('../middleware/auth');
+const router = express.Router();
+router.get('/', optionalAuth, ctrl.getPixels);
+router.get('/stats/map', ctrl.getMapStats);
+router.get('/leaderboard', ctrl.getLeaderboard);
+router.get('/my', protect, ctrl.getMyPixels);
+router.get('/:x/:y', optionalAuth, ctrl.getPixel);
+router.patch('/:x/:y', protect, ctrl.updatePixelMeta);
+module.exports = router;
